@@ -1,0 +1,2 @@
+class diff:
+    print("HelloWorld!");
