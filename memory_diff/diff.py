@@ -1,0 +1,2 @@
+class Diff:
+    print("HelloWorld!")

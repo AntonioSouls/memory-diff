@@ -1,2 +1,2 @@
 #This line of code will allow shorter imports
-from repodiff.diff import diff
+from memory_diff.diff import Diff
