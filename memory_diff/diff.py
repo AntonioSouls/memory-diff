@@ -4,13 +4,13 @@ from difflib import ndiff
 
 class Diff:
     ## ---- DA TRADURRE IN INGLESE QUESTA DESCRIZIONE ----------
-    # COSTRUTTORE DELLA CLASSE: stiamo dicendo che l'ogetto prende come parametri due file, dove il primo che inseriamo è quello "Nuovo", il secondo è il "Vecchio"
-    # Uso la convenzione che quello nuovo è quello con cui fare il confronto, dunque:
-    #       - se la diff mi ritorna ' ' vuol dire che la riga analizzata è uguale nei due file; 
-    #       - se ritorna '+' la linea esiste solo nel file che passiamo a destra nella diff (che a noi sarà quello vecchio). Dunque, va rimossa da lì;
-    #       - se ritorna '-' la linea esiste solo nel file che passiamo a sinistra nella diff (che a noi sarà quello nuovo). Dunque, va aggiunta nel file di destra (quello vecchio);
-    #       - se ritorna ('-', '?', '+') vuol dire che la linea analizzata possiede delle differenze nel mezzo, dunque dovremo prendere quella linea dal file nuovo e salvarla in quello vecchio
-    #         rimuovendo quella che già c'era
+    # CLASS CONSTRUCTOR: the object takes two files as parameters, where the first one we insert is the "new" one, the second one is the "old" one
+    # I use the convenction that the new one that's what i have to compare with, so:
+    #       - if diff returns ' ' it means that the analyzed line is the same in both files; 
+    #       - if diff returns '+' it means that the analyzed line exist only in the right file of the diff (in our example it will be the old one). So, we have to remove that line from the old one;
+    #       - if diff returns '-' it means that the analyzed line exist only in the left file of the diff (in our example it will be the new one). So, we have to add that line on the old one;
+    #       - if diff returns ('-', '?', '+') it means that the analyzed line had some difference in the middle, so we will thake that line from the new file and save it in the old one
+    #         removing the line that was already there
     
     def __init__(self,file_new: str, file_old:str) -> None: 
         self.file_new = file_new
@@ -21,7 +21,7 @@ class Diff:
     def diff_function(self):                                      # Fa' semplicemente la diff senza apportare modifiche
         self.lista_file_new = open(self.file_new, 'r').readlines()
         self.lista_file_old = open(self.file_old, 'r').readlines()
-        diff_result = list(ndiff(self.lista_file_new.splitlines(),self.lista_file_old.splitlines()))
+        diff_result = list(ndiff(self.lista_file_new,self.lista_file_old))
         return diff_result
 
     def saving_diff(self):                                         #Fa' la diff invocando la funzione di sopra, e poi sfrutta questa diff per modificare i file
