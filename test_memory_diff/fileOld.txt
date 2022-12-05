@@ -1,0 +1,8 @@
+  equals
++ non uguali
+- differenti
+- quarta riga modificata
+  equals
+  equals
+- modified?   --   -
++ mofie

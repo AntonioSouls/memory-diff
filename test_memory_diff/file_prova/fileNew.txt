@@ -1,3 +1,0 @@
-prima riga resta invariata
-terza riga da aggiungere all'old
-quarta riga modificata
