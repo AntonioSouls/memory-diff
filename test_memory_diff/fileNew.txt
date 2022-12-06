@@ -1,6 +1,6 @@
 equals
 differenti
-quarta riga modificata
+aggiunta
 equals
 equals
 modified

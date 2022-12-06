@@ -30,23 +30,19 @@ class Diff:
     def saving_diff(self):                                         #Fa' la diff invocando la funzione di sopra, e poi sfrutta questa diff per modificare i file
         diff_result = self.diff_function()
         print(diff_result)
-        # for x in diff_result:                                      #controllo riga per riga cosa è cambiato e, in base al controllo che faccio, modifico la lista corrispondente al vecchio file
-        #     if x[0] != ' ':                                             
-        #         if x[0] == '+':
-        #             self.lista_file_old.pop(diff_result.index(x))
-        #         else:
-        #             if x[0] == '-':
-        #                 self.lista_file_old.insert(diff_result.index(x), self.lista_file_new[diff_result.index(x)])
-        #             else:
-        #                 self.lista_file_old.pop(diff_result.index(x))
-        #                 self.lista_file_old.insert(diff_result.index(x), self.lista_file_new[diff_result.index(x)])
+        # # for x in diff_result:                                      #controllo riga per riga cosa è cambiato e, in base al controllo che faccio, modifico la lista corrispondente al vecchio file
+        # #     if x[0] != ' ':                                             
+        # #         if x[0] == '+':
+        # #             self.lista_file_old.pop(diff_result.index(x))
+        # #         else:
+        # #             if x[0] == '-':
+        # #                 self.lista_file_old.insert(diff_result.index(x), self.lista_file_new[diff_result.index(x)])
+        # #             else:
+        # #                 self.lista_file_old.pop(diff_result.index(x))
+        # #                 self.lista_file_old.insert(diff_result.index(x), self.lista_file_new[diff_result.index(x)])
         
         # object_file_old = open(self.file_old, 'w')                            #apro il vecchio file per riscriverci dentro la lista modificata
         # object_file_old.writelines(self.lista_file_old)                       #La scrivo
         # object_file_old.close()                                                #chiudo il file e lo restituisco
-        # return self.file_old                                                    
-
-        object_file_old = open(self.file_old, 'w')
-        object_file_old.writelines(diff_result)
-        object_file_old.close()
-        return self.file_old
+        # return self.file_old  
+        return                                                  

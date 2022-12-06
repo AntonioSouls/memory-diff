@@ -1,9 +1,0 @@
-README.md
-setup.py
-memory_diff/__init__.py
-memory_diff/diff.py
-memory_diff.egg-info/PKG-INFO
-memory_diff.egg-info/SOURCES.txt
-memory_diff.egg-info/dependency_links.txt
-memory_diff.egg-info/not-zip-safe
-memory_diff.egg-info/top_level.txt
