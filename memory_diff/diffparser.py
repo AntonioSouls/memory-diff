@@ -1,0 +1,1 @@
+# Parser class that analyze the diff results and discovers common pattern into this
