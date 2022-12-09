@@ -6,10 +6,10 @@
       <prop type="matecat-tee">41698</prop>
       <prop type="matecat-match">MT</prop>
       <tuv xml:lang="en-GB">
-        <seg>Important legal notice, really important</seg>
+	  <seg>Importante avviso legale, veramente importante</seg>
       </tuv>
       <tuv xml:lang="it-IT">
-        <seg>Importante avviso legale, veramente importante</seg>
+        <seg>Important legal notice, really important</seg>
       </tuv>
     </tu>
     <tu tuid="9685107" srclang="en-GB" datatype="plaintext" creationdate="20140304T160028Z" changedate="20140306T103120Z">
