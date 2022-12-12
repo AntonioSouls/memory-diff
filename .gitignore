@@ -162,3 +162,8 @@ cython_debug/
 
 # egg-info
 /mnt/c/Users/Antonio/Desktop/memory-diff/memory_diff.egg-info
+
+# .tmx files
+/mnt/c/Users/Antonio/Desktop/memory-diff/test_memory_diff/diff_file.tmx
+/mnt/c/Users/Antonio/Desktop/memory-diff/test_memory_diff/Matecat_New.tmx
+/mnt/c/Users/Antonio/Desktop/memory-diff/test_memory_diff/Matecat_Old.tmx
