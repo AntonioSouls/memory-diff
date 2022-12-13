@@ -16,11 +16,9 @@ class Diff:
     # Doing diff between two files: an Old File and a New File and saving into a third file only the differences between the preavious files
     def diff_function(self):
         with open(self.file_new, 'r') as file_object_new:                      # Opening the new file for reading
-            for line in file_object_new:
-                self.list_file_new.append(line)
+            self.list_file_new = file_object_new.read()
         with open(self.file_old, 'r') as file_object_old:                      # Opening the old file for reading
-            for line in file_object_old:
-                self.list_file_old.append(line)
+            self.list_file_old = file_object_old.read()
         
         
         
