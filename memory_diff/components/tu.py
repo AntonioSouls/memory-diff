@@ -1,6 +1,5 @@
 from memory_diff.components import Prop
 from memory_diff.components import Tuv
-from memory_diff.components.tu import TranslatedUnit
 
 # TranslatedUnit class that models an object that simulate the behavior of <tu> tag
 
@@ -64,7 +63,13 @@ class TranslatedUnit:
     
     
     
-    def equals(self,translated_unit_old:TranslatedUnit):   # DEFINIRE BENE LA LOGICA DI QUESTO EQUALS PERCHE' E' IMPORTANTE
+    def __eq__(self,translated_unit_old):   # DEFINIRE BENE LA LOGICA DI QUESTO EQUALS PERCHE' E' IMPORTANTE
         if self.tuid == translated_unit_old.getId():
-            print()
+            if self.srclang == translated_unit_old.get_srclang() and self.datatype == translated_unit_old.get_datatype() and self.creationdate == translated_unit_old.get_creationdate() and self.changedate == translated_unit_old.get_changedate():
+                if self.prop_first == translated_unit_old.get_prop_first and self.prop_second == translated_unit_old.get_prop_second():
+                    if self.tuv_first == translated_unit_old.get_tuv_first() and self.tuv_second == translated_unit_old.get_tuv_second():
+                        return True
+                    return False
+                return False
+            return False
         return False

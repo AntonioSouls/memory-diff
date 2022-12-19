@@ -1,4 +1,4 @@
-from memory_diff.components import Tuv
+
 
 # Tuv class that models an object that simulate the behavior of <tuv> tag
 
@@ -17,7 +17,7 @@ class Tuv:
     def setContent(self, content:str):
         self.content = content
     
-    def equals(self, tuv_old:Tuv):
+    def __eq__(self, tuv_old):
         if self.xml_lang == tuv_old.get_xml and self.content == tuv_old.getContent:
             return True
         return False

@@ -1,4 +1,4 @@
-from memory_diff.components import Prop
+
 
 # Prop class that models an object that simulate the behavior of <prop> tag
 
@@ -17,7 +17,7 @@ class Prop:
     def setContent(self, content:str):
         self.content = content
 
-    def equals(self,prop_old: Prop):
+    def __eq__(self,prop_old):
         if self.content == prop_old.getContent() and self.type == prop_old.getType():
             return True
         return False
