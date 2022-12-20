@@ -3,9 +3,13 @@
 # Prop class that models an object that simulate the behavior of <prop> tag
 
 class Prop:
-    def __init__(self, type:str, content:str) -> None:
-        self.type = type
-        self.content = content
+    def __init__(self, prop_tag) -> None:
+        self.type = prop_tag['type']
+        self.content = prop_tag.string
+
+    def __init__(self) -> None:
+        self.type = None
+        self.content = None
 
     def getType(self):
         return self.type

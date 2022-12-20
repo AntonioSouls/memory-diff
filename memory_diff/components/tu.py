@@ -1,20 +1,31 @@
-from memory_diff.components import Prop
-from memory_diff.components import Tuv
+from memory_diff.components.prop import Prop
+from memory_diff.components.tuv import Tuv
+from bs4 import BeautifulSoup
 
 # TranslatedUnit class that models an object that simulate the behavior of <tu> tag
 
 class TranslatedUnit:
 
-    def __init__(self,tuid:int,srclang:str,datatype:str, creationdate:str, changedate:str, prop1:Prop, prop2:Prop,tuv1:Tuv,tuv2:Tuv) -> None:
-        self.tuid = tuid
-        self.srclang = srclang
-        self.datatype = datatype
-        self.creationdate = creationdate
-        self.changedate = changedate
-        self.prop_first = prop1
-        self.prop_second = prop2
-        self.tuv_first = tuv1
-        self.tuv_second = tuv2
+    def __init__(self,tu_tag) -> None:
+        tuv_tag_list = tu_tag.find_all('tuv')
+        prop_tag_list = tu_tag.find_all('prop')
+        self.tuid = int(tu_tag['tuid'])
+        self.srclang = tu_tag['srclang']
+        self.datatype = tu_tag['datatype']
+        self.creationdate = tu_tag['creationdate']
+        self.changedate = tu_tag['changedate']
+        self.tuv_first = Tuv(tuv_tag_list[0])
+        self.tuv_second = Tuv(tuv_tag_list[1])
+
+        if len(prop_tag_list) == 1:
+            prop_first_object = Prop(prop_tag_list[0])
+            prop_second_object = Prop()
+        else:
+            prop_first_object = Prop(prop_tag_list[0])
+            prop_second_object = Prop(prop_tag_list[1])
+        
+        self.prop_first = prop_first_object
+        self.prop_second = prop_second_object
 
     def getId(self):
         return self.tuid
@@ -64,12 +75,10 @@ class TranslatedUnit:
     
     
     def __eq__(self,translated_unit_old):   # DEFINIRE BENE LA LOGICA DI QUESTO EQUALS PERCHE' E' IMPORTANTE
+        equals: bool = False
         if self.tuid == translated_unit_old.getId():
             if self.srclang == translated_unit_old.get_srclang() and self.datatype == translated_unit_old.get_datatype() and self.creationdate == translated_unit_old.get_creationdate() and self.changedate == translated_unit_old.get_changedate():
-                if self.prop_first == translated_unit_old.get_prop_first and self.prop_second == translated_unit_old.get_prop_second():
+                if self.prop_first == translated_unit_old.get_prop_first() and self.prop_second == translated_unit_old.get_prop_second():
                     if self.tuv_first == translated_unit_old.get_tuv_first() and self.tuv_second == translated_unit_old.get_tuv_second():
-                        return True
-                    return False
-                return False
-            return False
-        return False
+                        equals = True
+        return equals
