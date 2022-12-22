@@ -52,21 +52,23 @@ class Diff:
     
     # Saving the differences into a third file called diff_file
     def saving_diff(self,list_block_diff):
-        root = ET.Element('tmx')                                        # Root Creation
-        root.set('version','1.4')                                       # Setting root's attributes
+        Bs_data_new = BeautifulSoup(self.opened_file_new, "xml")
+        tag_header_of_new_file = Bs_data_new.find('header')
+        root = ET.Element('tmx')                                               # Root Creation
+        root.set('version','1.4')                                              # Setting root's attributes
         
-        header = ET.SubElement(root,'header')                           # Header Creation as root's subelement 
-        header.set('creationtool','MyMemory - Database export tool')    # Setting header's attributes
-        header.set('creationtoolversion','1.0')
-        header.set('datatype','plaintext')
-        header.set('o-tmf','MyMemory')
-        header.set('segtype','sentence')
-        header.set('adminlang','en-US')
-        header.set('srclang','en-GB')
+        header = ET.SubElement(root,'header')                                  # Header Creation as root's subelement 
+        header.set('creationtool',tag_header_of_new_file['creationtool'])      # Setting header's attributes
+        header.set('creationtoolversion',tag_header_of_new_file['creationtoolversion'])
+        header.set('datatype',tag_header_of_new_file['datatype'])
+        header.set('o-tmf',tag_header_of_new_file['o-tmf'])
+        header.set('segtype',tag_header_of_new_file['segtype'])
+        header.set('adminlang',tag_header_of_new_file['adminlang'])
+        header.set('srclang',tag_header_of_new_file['srclang'])
 
-        body = ET.SubElement(header,'body')                             # Body creation as header's subelement
+        body = ET.SubElement(root,'body')                                      # Body creation as root's subelement
 
-        for tu_object in list_block_diff:
+        for tu_object in list_block_diff:                                      # Add a complete <tu> tag with all attributes and all sub-tags for each tu_object that have into list 
             tu = ET.SubElement(body, 'tu')
             tu.set('tuid',str(tu_object.getId()))
             tu.set('srclang',tu_object.get_srclang())
@@ -74,13 +76,14 @@ class Diff:
             tu.set('creationdate',tu_object.get_creationdate())
             tu.set('changedate',tu_object.get_changedate())
             prop_first = ET.SubElement(tu,'prop')
-            prop_second = ET.SubElement(tu,'prop')
-            tuv_first = ET.SubElement(tu,'tuv')
-            tuv_second = ET.SubElement(tu,'tuv')
             prop_first.set('type',tu_object.get_prop_first().getType())
             prop_first.text = tu_object.get_prop_first().getContent()
-            prop_second.set('type',tu_object.get_prop_second().getType())
-            prop_second.text = tu_object.get_prop_second().getContent()
+            if(tu_object.get_prop_second().getType() != None or tu_object.get_prop_second().getContent() != None):
+                prop_second = ET.SubElement(tu,'prop')
+                prop_second.set('type',tu_object.get_prop_second().getType())
+                prop_second.text = tu_object.get_prop_second().getContent()
+            tuv_first = ET.SubElement(tu,'tuv')
+            tuv_second = ET.SubElement(tu,'tuv')
             tuv_first.set('xml:lang',tu_object.get_tuv_first().get_xml())
             seg_first = ET.SubElement(tuv_first, 'seg')
             seg_first.text = tu_object.get_tuv_first().getContent()
@@ -88,8 +91,10 @@ class Diff:
             seg_second = ET.SubElement(tuv_second, 'seg')
             seg_second.text = tu_object.get_tuv_second().getContent()
         
-        diff_tmx = ET.tostring(root)
 
-        with open(self.file_diff, 'wb') as f:
-            f.write('<?xml version="1.0" encoding="UTF-8"?>')
-            f.write(diff_tmx)
+        diff_tmx = ET.tostring(root)                                              # Create a string to represent the just created xml file
+        bs_data = BeautifulSoup(diff_tmx, 'xml')                                  # Transform that string into a beautiful soup element that we use to correctly identify the xml file
+        xml = bs_data.prettify("UTF-8")                                           # Identify the beautiful soup correctly
+
+        with open(self.file_diff, 'wb') as f:                                     # Saving into a file the Beautiful Soup object correctly identified
+            f.write(xml)
