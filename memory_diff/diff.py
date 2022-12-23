@@ -52,22 +52,36 @@ class Diff:
     
     # Saving the differences into a third file called diff_file
     def saving_diff(self,list_block_diff):
-        Bs_data_new = BeautifulSoup(self.opened_file_new, "xml")
+        root = ET.Element('tmx')                                                  # Root Creation
+        root.set('version','1.4')                                                 # Setting root's attributes
+        self.build_header(root)                                                   # Header creation as root's subelement
+        body = ET.SubElement(root,'body')                                         # Body creation as root's subelement
+        self.build_tu(list_block_diff,body)
+
+        diff_tmx = ET.tostring(root)                                              # Create a string to represent the just created xml file
+        bs_data = BeautifulSoup(diff_tmx, 'xml')                                  # Transform that string into a beautiful soup element that we use to correctly identify the xml file
+        xml = bs_data.prettify("UTF-8")                                           # Identify the beautiful soup correctly
+
+        with open(self.file_diff, 'wb') as f:                                     # Saving into a file the Beautiful Soup object correctly identified
+            f.write(xml)
+    
+
+    # Method that helps self.saving_diff() to create the header part of the diff file
+    def build_header(self,root):
+        Bs_data_new = BeautifulSoup(self.opened_file_new, "xml")                  # Using new file to discover the value of header's attributes
         tag_header_of_new_file = Bs_data_new.find('header')
-        root = ET.Element('tmx')                                               # Root Creation
-        root.set('version','1.4')                                              # Setting root's attributes
-        
-        header = ET.SubElement(root,'header')                                  # Header Creation as root's subelement 
-        header.set('creationtool',tag_header_of_new_file['creationtool'])      # Setting header's attributes
+        header = ET.SubElement(root,'header')                                     # Header Creation as root's subelement 
+        header.set('creationtool',tag_header_of_new_file['creationtool'])         # Setting header's attributes
         header.set('creationtoolversion',tag_header_of_new_file['creationtoolversion'])
         header.set('datatype',tag_header_of_new_file['datatype'])
         header.set('o-tmf',tag_header_of_new_file['o-tmf'])
         header.set('segtype',tag_header_of_new_file['segtype'])
         header.set('adminlang',tag_header_of_new_file['adminlang'])
         header.set('srclang',tag_header_of_new_file['srclang'])
+    
 
-        body = ET.SubElement(root,'body')                                      # Body creation as root's subelement
-
+    # Method that helps self.saving_diff() to create the Translated Unit part of the diff file
+    def build_tu(self,list_block_diff,body):
         for tu_object in list_block_diff:                                      # Add a complete <tu> tag with all attributes and all sub-tags for each tu_object that have into list 
             tu = ET.SubElement(body, 'tu')
             tu.set('tuid',str(tu_object.getId()))
@@ -90,11 +104,3 @@ class Diff:
             tuv_second.set('xml:lang',tu_object.get_tuv_second().get_xml())
             seg_second = ET.SubElement(tuv_second, 'seg')
             seg_second.text = tu_object.get_tuv_second().getContent()
-        
-
-        diff_tmx = ET.tostring(root)                                              # Create a string to represent the just created xml file
-        bs_data = BeautifulSoup(diff_tmx, 'xml')                                  # Transform that string into a beautiful soup element that we use to correctly identify the xml file
-        xml = bs_data.prettify("UTF-8")                                           # Identify the beautiful soup correctly
-
-        with open(self.file_diff, 'wb') as f:                                     # Saving into a file the Beautiful Soup object correctly identified
-            f.write(xml)

@@ -4,12 +4,8 @@
 
 class Prop:
     def __init__(self, prop_tag=None) -> None:
-        if prop_tag:
-            self.type = prop_tag['type']
-            self.content = prop_tag.string
-        else:
-            self.type = None
-            self.content = None
+        self.type = prop_tag['type'] if prop_tag else None
+        self.content = prop_tag.string if prop_tag else None
 
     def getType(self):
         return self.type

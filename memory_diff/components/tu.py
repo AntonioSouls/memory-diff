@@ -74,7 +74,7 @@ class TranslatedUnit:
     
     
     
-    def __eq__(self,translated_unit_old):   # DEFINIRE BENE LA LOGICA DI QUESTO EQUALS PERCHE' E' IMPORTANTE
+    def __eq__(self,translated_unit_old):   
         equals: bool = False
         if self.tuid == translated_unit_old.getId():
             if self.srclang == translated_unit_old.get_srclang() and self.datatype == translated_unit_old.get_datatype() and self.creationdate == translated_unit_old.get_creationdate() and self.changedate == translated_unit_old.get_changedate():
