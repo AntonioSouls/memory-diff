@@ -97,10 +97,14 @@ class Diff:
         for tu_object in list_block_diff:                                      # Add a complete <tu> tag with all attributes and all sub-tags for each tu_object that have into list 
             tu = ET.SubElement(body, 'tu')
             tu.set('tuid',str(tu_object.getId()))
-            tu.set('srclang',tu_object.get_srclang())
-            tu.set('datatype',tu_object.get_datatype())
-            tu.set('creationdate',tu_object.get_creationdate())
-            tu.set('changedate',tu_object.get_changedate())
+            if tu_object.get_srclang() != None:
+                tu.set('srclang',tu_object.get_srclang())
+            if tu_object.get_datatype() != None:
+                tu.set('datatype',tu_object.get_datatype())
+            if tu_object.get_creationdate() != None:
+                tu.set('creationdate',tu_object.get_creationdate())
+            if tu_object.get_changedate() != None:
+                tu.set('changedate',tu_object.get_changedate())
             if tu_object.getRemoved() != None :
                 tu.set('removed','True')
             prop_first = ET.SubElement(tu,'prop')
