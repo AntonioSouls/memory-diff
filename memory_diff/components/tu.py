@@ -10,10 +10,11 @@ class TranslatedUnit:
         tuv_tag_list = tu_tag.find_all('tuv')
         prop_tag_list = tu_tag.find_all('prop')
         self.tuid = int(tu_tag['tuid'])
-        self.srclang = tu_tag['srclang']
-        self.datatype = tu_tag['datatype']
-        self.creationdate = tu_tag['creationdate']
-        self.changedate = tu_tag['changedate']
+        self.srclang = tu_tag['srclang'] if 'srclang' in tu_tag else None
+        self.datatype = tu_tag['datatype'] if 'datatype' in tu_tag else None
+        self.creationdate = tu_tag['creationdate'] if 'creationdate' in tu_tag else None
+        self.changedate = tu_tag['changedate'] if 'changedate' in tu_tag else None
+        self.removed = None
         self.tuv_first = Tuv(tuv_tag_list[0])
         self.tuv_second = Tuv(tuv_tag_list[1])
 
@@ -31,6 +32,11 @@ class TranslatedUnit:
         return self.tuid
     def setId(self, id:int):
         self.tuid = id
+    
+    def getRemoved(self):
+        return self.removed
+    def setRemoved(self, removed:bool):
+        self.removed = removed
     
     def get_srclang(self):
         return self.srclang

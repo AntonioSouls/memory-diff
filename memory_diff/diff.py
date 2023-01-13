@@ -46,6 +46,18 @@ class Diff:
             if not exist:
                 list_block_diff.append(tu_object_new)
         
+        for tu_tag_old in old_list_tag_tu:
+            same_id:bool = False
+            for tu_tag_new in new_list_tag_tu:
+                if same_id:
+                    break
+                if tu_tag_old['tuid'] == tu_tag_new['tuid']:
+                    same_id = True
+            if not same_id:
+                object_removed = TranslatedUnit(tu_tag_old)
+                object_removed.setRemoved(True)
+                list_block_diff.append(object_removed)
+        
         self.saving_diff(list_block_diff)                                # Invoke saving_diff method to save the diff block into a file
 
     
@@ -85,10 +97,16 @@ class Diff:
         for tu_object in list_block_diff:                                      # Add a complete <tu> tag with all attributes and all sub-tags for each tu_object that have into list 
             tu = ET.SubElement(body, 'tu')
             tu.set('tuid',str(tu_object.getId()))
-            tu.set('srclang',tu_object.get_srclang())
-            tu.set('datatype',tu_object.get_datatype())
-            tu.set('creationdate',tu_object.get_creationdate())
-            tu.set('changedate',tu_object.get_changedate())
+            if tu_object.get_srclang() != None:
+                tu.set('srclang',tu_object.get_srclang())
+            if tu_object.get_datatype() != None:
+                tu.set('datatype',tu_object.get_datatype())
+            if tu_object.get_creationdate() != None:
+                tu.set('creationdate',tu_object.get_creationdate())
+            if tu_object.get_changedate() != None:
+                tu.set('changedate',tu_object.get_changedate())
+            if tu_object.getRemoved() != None :
+                tu.set('removed','True')
             prop_first = ET.SubElement(tu,'prop')
             prop_first.set('type',tu_object.get_prop_first().getType())
             prop_first.text = tu_object.get_prop_first().getContent()
