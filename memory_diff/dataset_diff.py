@@ -3,11 +3,12 @@ import shutil
 from tqdm import tqdm
 from memory_diff.diff import Diff
 import time
+import psutil
 from numpy import mean
 
 # Dataset_diff class that models an object that allows you to make the diff on entire dataset
 
-class Dataset_diff:
+class DatasetDiff:
     # CLASS CONSTRUCTOR: the object takes three directory as parameters, where the first one we insert is the dataset new's directory, the second one is the dataset old's directory
     # the third one is the directory in which we save all the files that contains only the differences
     def __init__(self,directory_new:str,directory_old:str,directory_diff:str) -> None:
@@ -15,6 +16,9 @@ class Dataset_diff:
         self.directory_old = directory_old
         self.directory_diff = directory_diff
         self.total_diff_time = []
+        self.misuration_cpu_usage = []
+        self.misuration_ram_usage = []
+
 
     # function that ciclate on entire dataset that contains a list of file new and the corresponding file old, so, that function, for each file_new, search the corresponding file old
     # (the file old with the same name) and invoke diff to make difference between those two files. This operation is made for all the file new in the dataset and the differences are saved into
@@ -57,6 +61,7 @@ class Dataset_diff:
         print('Dataset new size: ', directory_new_path_size, 'bytes', '\n')
         print('Dataset old size: ', directory_old_path_size, 'bytes', '\n')
         print('Dataset diff size: ', directory_diff_path_size, 'bytes', '\n')
+        print('Singles diff time: ', self.total_diff_time, '\n')
         print('Average diff time: ', mean(self.total_diff_time), 'seconds','\n')
         print('Maximum diff time: ', max(self.total_diff_time), 'seconds', '\n')
         return
