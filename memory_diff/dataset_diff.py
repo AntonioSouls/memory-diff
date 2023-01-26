@@ -23,7 +23,7 @@ class DatasetDiff:
     # function that ciclate on entire dataset that contains a list of file new and the corresponding file old, so, that function, for each file_new, search the corresponding file old
     # (the file old with the same name) and invoke diff to make difference between those two files. This operation is made for all the file new in the dataset and the differences are saved into
     # the diff_folder
-    def starting_diff(self):
+    def starting_diff_on_dataset(self):
         thread1 = Thread(target=self.cpu_usage)
         thread2 = Thread(target=self.ram_usage)
         thread1.start()
@@ -32,10 +32,12 @@ class DatasetDiff:
         directory_old_path = Path(self.directory_old)
         list_file_new = list(directory_new_path.iterdir())
         list_file_old = list(directory_old_path.iterdir())
+        list_file_diff = list(Path(self.directory_diff).iterdir())
         old_names = [f.name for f in list_file_old]
+        diff_names = [f.name for f in list_file_diff]
         for file_new in tqdm(list_file_new):
-            if 'opus' not in file_new.name.lower() and file_new.name not in list(Path(self.directory_diff).iterdir()):          # I'm not considering the 'Opus' files because had problem to solve
-                print(file_new)
+            print(file_new)
+            if 'opus' not in file_new.name.lower() and file_new.name not in diff_names:          # I'm not considering the 'Opus' files because had problem to solve and not considering files that already contain the diff
                 file_old = None
                 diff_file = str(Path(self.directory_diff) / file_new.name)
                 begin = time.time()
@@ -44,7 +46,7 @@ class DatasetDiff:
                     print(file_old)
                     print(diff_file)
                     diff_object = Diff(str(file_new), str(file_old), diff_file)
-                    diff_object.diff_function()
+                    diff_object.diff_open_files()
                 else:
                     print(file_old)
                     print(diff_file)
@@ -52,12 +54,10 @@ class DatasetDiff:
                 ends = time.time()
                 diff_time = ends - begin
                 self.total_diff_time.append(diff_time)
-                print(list_file_new.index(file_new))
-                print('\n')
+                self.print_stats()
+            print('\n')
         thread1.join()
         thread2.join()
-        self.print_stats()
-        return
     
 
     # Function that print into a file all the diff's stats, so we can misure how much efficent our diff is
@@ -74,7 +74,7 @@ class DatasetDiff:
         list_stats.append('Maximum diff time: ' + str(max(self.total_diff_time)) + 'seconds')
         with open(file_stats, 'a+') as f:
             f.writelines(list_stats)
-        return
+        
     
 
     # Function that print into a file the CPU usage during the diff execution
@@ -85,7 +85,7 @@ class DatasetDiff:
             with open(file_cpu_stats, 'a+') as f:
                 f.write('CPU usage: ' + misuration_cpu_usage+ "\n")
             time.sleep(10)
-        return
+        
 
     # Function that print into a file the RAM usage during the diff execution  
     def ram_usage(self):
@@ -95,4 +95,4 @@ class DatasetDiff:
             with open(file_ram_stats, 'a+') as f:
                 f.write('RAM usage: ' + misuration_ram_usage + "\n")
             time.sleep(10)
-        return
+        
