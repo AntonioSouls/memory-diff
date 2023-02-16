@@ -1,11 +1,17 @@
-
+from xml.etree.ElementTree import Element
 
 # Tuv class that models an object that simulate the behavior of <tuv> tag
 
 class Tuv:
-    def __init__(self,tuv_tag) -> None:
-        self.xml_lang = tuv_tag['xml:lang']
-        self.content = tuv_tag.seg.string
+    def __init__(self,tuv_tmx:Element) -> None:
+        if(tuv_tmx is None):
+            self.xml_lang = None
+            self.content = None
+        else:
+            xml_lang = tuv_tmx.attrib.get('{http://www.w3.org/XML/1998/namespace}lang')
+            self.xml_lang = xml_lang
+            seg_tmx = tuv_tmx.findall("seg")
+            self.content = seg_tmx[0].text
     
     def get_xml(self):
         return self.xml_lang
