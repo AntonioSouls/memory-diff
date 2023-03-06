@@ -19,6 +19,8 @@ class DatasetDiff:
         self.directory_diff = directory_diff
         self.directory_stats = directory_stats
         self.total_diff_time = []
+        self.total_CPU_usages = []
+        self.total_RAM_usages = []
         self.total_execution_time = 0
 
 
@@ -100,7 +102,8 @@ class DatasetDiff:
             misuration_cpu_usage = str(psutil.cpu_percent())
             with open(file_cpu_stats, 'a+') as f:
                 f.write('CPU usage: ' + misuration_cpu_usage+ "\n")
-            time.sleep(10)
+                self.total_CPU_usages.append(misuration_cpu_usage)
+            time.sleep(300)
         
 
     # Function that print into a file the RAM usage during the diff execution  
@@ -110,4 +113,5 @@ class DatasetDiff:
             misuration_ram_usage = str(psutil.virtual_memory()[2])
             with open(file_ram_stats, 'a+') as f:
                 f.write('RAM usage: ' + misuration_ram_usage + "\n")
-            time.sleep(10)
+            self.total_RAM_usages.append(misuration_ram_usage)
+            time.sleep(300)

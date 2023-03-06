@@ -17,6 +17,7 @@ class Diff:
         self.file_new = file_new
         self.file_old = file_old
         self.file_diff = file_diff
+        self.num_workers = 128
         self.opened_file_new = None
         self.opened_file_old = None
 
@@ -35,20 +36,26 @@ class Diff:
         old_dictionary_tu_object =multiprocessing.Manager().dict()
 
 
-        for tu_object_new in new_list_tu_object:
-            TranslationUnit_object_new = TranslatedUnit(fromstring(str(tu_object_new)))
-            new_dictionary_tu_object[TranslationUnit_object_new.getId()] = TranslationUnit_object_new
-
-        for tu_object_old in old_list_tu_object:
-            TranslationUnit_object_old = TranslatedUnit(fromstring(str(tu_object_old)))
-            old_dictionary_tu_object[TranslationUnit_object_old.getId()] = TranslationUnit_object_old
+        thread1 = Thread(target=self.building_dictionary, args=(new_list_tu_object,new_dictionary_tu_object))
+        thread2 = Thread(target=self.building_dictionary, args=(old_list_tu_object,old_dictionary_tu_object))
+        thread1.start()
+        thread2.start()
+        thread1.join()
+        thread2.join()
         
         self.diff_function(new_dictionary_tu_object,old_dictionary_tu_object)                   # Invoking the function that litterally parse both <tu> tag's lists and save into the third one only the differences
 
     
+    def building_dictionary(self,list_tu_object,dictionary_tu_object):
+        for tu_object in list_tu_object:
+            TranslationUnit_object = TranslatedUnit(fromstring(str(tu_object)))
+            dictionary_tu_object[TranslationUnit_object.getId()] = TranslationUnit_object
+        return
+
+
     # Doing diff between the elements of two lists: a list that contains old tag <tu> and a list that contains new tag <tu> and saving into a third list only the differences between the preavious files
     def diff_function(self, new_dictionary_tu_object,old_dictionary_tu_object):
-        pool = multiprocessing.Pool(16)                                                                                                             # Creating a pool of 16 processes to parallelize the diff and make 16 diff at a time
+        pool = multiprocessing.Pool(self.num_workers)                                                                                                             # Creating a pool of 16 processes to parallelize the diff and make 16 diff at a time
         list_block_diff=[]
         list_processes=list()
         for new_key in new_dictionary_tu_object.keys():                                                                                                                         # I'm parsing the whole list containing the new <tu> blocks and I compare each of these blocks with 
@@ -75,16 +82,10 @@ class Diff:
     @staticmethod
     def view_added_modified_blocks(key,new_tu_object,old_dictionary_tu_object):
         
-        start = time.time()
-        print("Inizio thread")
         if key in old_dictionary_tu_object.keys():
             if new_tu_object == old_dictionary_tu_object[key]:
-                end = time.time()
-                print(f'{key}: {end - start}')
                 return None
         tu_object_diff = new_tu_object
-        end = time.time()
-        print(f'{key}: {end - start}')
         return str(tu_object_diff)
     
 
@@ -92,16 +93,10 @@ class Diff:
     # of the <tu> block old, it means that the old <tu> block has been removed, so I have to add it to the list that contains differences but added it as a removed block with the removed tag
     @staticmethod
     def view_removed_blocks(key,new_dictionary_tu_object,old_tu_object):
-        print("Inizio secondo thread")
-        start = time.time()
         if key in new_dictionary_tu_object:
-            end = time.time()
-            print(f'{key}: {end - start}')
             return None
         tu_object_diff:TranslatedUnit = old_tu_object
         tu_object_diff.setRemoved(True)
-        end = time.time()
-        print(f'{key}: {end - start}')
         return str(tu_object_diff)
 
     
