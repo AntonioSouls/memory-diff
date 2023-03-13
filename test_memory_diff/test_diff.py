@@ -5,17 +5,17 @@ from memory_diff.diff import Diff
 
 class Test_TestIncrementDecrement(unittest.TestCase):
 
-    def test_saving_diff(self,directory_new:str ='/home/antonio-lanza/dataset/2022.3.0/en__sw',directory_old:str='/home/antonio-lanza/dataset/2022.2.0/en__sw',directory_diff:str='/home/antonio-lanza/dataset/diff_folder',directory_stats:str='/home/antonio-lanza/dataset/stats'):
+    def test_saving_diff(self,directory_new:str ='/home/antonio/dataset/2022.3.0/en__sw',directory_old:str='/home/antonio/dataset/2022.2.0/en__sw',directory_diff:str='/home/antonio/dataset/diff_folder',directory_stats:str='/home/antonio/dataset/stats'):
         dataset_diff_object = DatasetDiff(directory_new,directory_old,directory_diff,directory_stats)
         dataset_diff_object.starting_diff_on_dataset()
         return
 
-    # def test_diff_on_singles_files(self,file_new:str = '/home/antonio-lanza/dataset/2022.3.0/en__sw/MyMemory.38qV0.0hvcRAU.en-GB__sw-SZ.tmx',file_old:str = '/home/antonio-lanza/dataset/2022.2.0/en__sw/MyMemory.38qV0.0hvcRAU.en-GB__sw-SZ.tmx',file_diff:str ='/home/antonio-lanza/dataset/MyMemory.38qV0.0hvcRAU.en-GB__sw-SZ.tmx'):
+    # def test_diff_on_singles_files(self,file_new:str = '/home/antonio/dataset/2022.3.0/en__sw/MyMemory.f6841844ded9600e7d54.en-US__sw-SZ.tmx',file_old:str = '/home/antonio/dataset/2022.2.0/en__sw/MyMemory.f6841844ded9600e7d54.en-US__sw-SZ.tmx',file_diff:str ='/home/antonio/dataset/MyMemory.f6841844ded9600e7d54.en-US__sw-SZ.tmx'):
     #     diff_object = Diff(file_new,file_old,file_diff)
     #     diff_object.diff_open_files()
     #     return
 
-    # def test_diff_on_singles_files(self,file_new:str = '/home/antonio-lanza/dataset/2022.3.0/en__sw/Matecat.P24171J29476.en-US__sw-SZ.tmx',file_old:str = '/home/antonio-lanza/dataset/2022.2.0/en__sw/Matecat.P24171J29476.en-US__sw-SZ.tmx',file_diff:str ='/home/antonio-lanza/dataset/Matecat.P24171J29476.en-US__sw-SZ.tmx'):
+    # def test_diff_on_singles_files(self,file_new:str = '/home/antonio/dataset/2022.3.0/en__sw/Matecat.P24171J29476.en-US__sw-SZ.tmx',file_old:str = '/home/antonio/dataset/2022.2.0/en__sw/Matecat.P24171J29476.en-US__sw-SZ.tmx',file_diff:str ='/home/antonio/dataset/Matecat.P24171J29476.en-US__sw-SZ.tmx'):
     #     diff_object = Diff(file_new,file_old,file_diff)
     #     diff_object.diff_open_files()
     #     return
