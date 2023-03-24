@@ -1,13 +1,12 @@
 import multiprocessing
 from bs4 import BeautifulSoup
-import xml.etree.ElementTree as ET
 from memory_diff.components.tu import TranslatedUnit
-from translate.storage.tmx import tmxfile, tmxunit
+from translate.storage.tmx import tmxfile
 from typing import List
 from xml.etree.ElementTree import fromstring
 from tqdm import tqdm
-from threading import Thread
-import time
+import threading
+from lxml import etree
 
 
 
@@ -26,38 +25,65 @@ class Diff:
     
     def diff_open_files(self):
         with open(self.file_new, 'rb') as file_object_new:                      
-            self.opened_file_new = tmxfile(file_object_new)
+            self.opened_file_new = file_object_new.read()
         with open(self.file_old, 'rb') as file_object_old:                      
-            self.opened_file_old = tmxfile(file_object_old)
-        
-        new_list_tu_object = self.opened_file_new.getunits()                          
-        old_list_tu_object = self.opened_file_old.getunits()
+            self.opened_file_old = file_object_old.read()
 
+        parser = etree.XMLParser(recover=True)
+
+        new_tree = etree.fromstring(self.opened_file_new,parser)
+        old_tree = etree.fromstring(self.opened_file_old,parser)
+
+        new_tmx_object = tmxfile.parsestring(etree.tostring(new_tree))
+        old_tmx_object = tmxfile.parsestring(etree.tostring(old_tree))
+        
+        new_list_tu_object = new_tmx_object.getunits()                          
+        old_list_tu_object = old_tmx_object.getunits()
+        
         new_dictionary_tu_object = multiprocessing.Manager().dict()
         old_dictionary_tu_object = multiprocessing.Manager().dict()
 
         
-        for tu_object_new in new_list_tu_object:
-            TranslationUnit_object_new = TranslatedUnit(fromstring(str(tu_object_new)))
-            new_dictionary_tu_object[TranslationUnit_object_new.getId()] = TranslationUnit_object_new
-        for tu_object_old in old_list_tu_object:
-            TranslationUnit_object_old = TranslatedUnit(fromstring(str(tu_object_old)))
-            old_dictionary_tu_object[TranslationUnit_object_old.getId()] = TranslationUnit_object_old
+        thread1 = threading.Thread(target=self.building_dictionary,args=(new_list_tu_object,new_dictionary_tu_object))
+        thread2 = threading.Thread(target=self.building_dictionary,args=(old_list_tu_object,old_dictionary_tu_object))
+        thread1.start()
+        thread2.start()
+        thread1.join()
+        thread2.join()
         
-        
+
         self.diff_function(new_dictionary_tu_object,old_dictionary_tu_object)                   
 
-  
+    
+    def building_dictionary(self,list_tu_object,dictionary_tu_object):
+        for tu_object in tqdm(list_tu_object):
+            TranslationUnit_object = TranslatedUnit(fromstring(str(tu_object)))
+            if(TranslationUnit_object.getId() is not None):
+                lista:list = dictionary_tu_object.get(TranslationUnit_object.getId())
+                if(lista is None):
+                    lista=list()
+                lista.append(TranslationUnit_object)
+                dictionary_tu_object[TranslationUnit_object.getId()] = lista
+            else:
+                hash_TranslationUnit_object = TranslationUnit_object.hash_tu()
+                hash_list:list = dictionary_tu_object.get(hash_TranslationUnit_object)
+                if(hash_list is None):
+                    hash_list = list()
+                hash_list.append(TranslationUnit_object)
+                dictionary_tu_object[hash_TranslationUnit_object] = hash_list
+        return
+    
+
     def diff_function(self, new_dictionary_tu_object,old_dictionary_tu_object):
         pool = multiprocessing.Pool(self.num_workers)                                                                                                             
         list_block_diff=[]
         list_processes=list()
         for new_key in tqdm(new_dictionary_tu_object):                                                                                                                          
-            list_processes.append(pool.apply_async(Diff.view_added_modified_blocks,args=(new_key,new_dictionary_tu_object[new_key],old_dictionary_tu_object)))                       
+            list_processes.append(pool.apply_async(Diff.view_added_modified_blocks,args=(new_key,new_dictionary_tu_object[new_key][0],old_dictionary_tu_object)))                       
 
 
         for old_key in tqdm(old_dictionary_tu_object):
-            list_processes.append(pool.apply_async(Diff.view_removed_blocks, args=(old_key,new_dictionary_tu_object,old_dictionary_tu_object[old_key])))
+            list_processes.append(pool.apply_async(Diff.view_removed_blocks, args=(old_key,new_dictionary_tu_object,old_dictionary_tu_object[old_key][0])))
             
         
         pool.close()
@@ -74,7 +100,8 @@ class Diff:
     def view_added_modified_blocks(key,new_tu_object,old_dictionary_tu_object):
         
         if key in old_dictionary_tu_object:
-            if new_tu_object == old_dictionary_tu_object[key]:
+            lista = old_dictionary_tu_object[key]
+            if new_tu_object == lista[0]:
                 return None
         tu_object_diff = new_tu_object
         return str(tu_object_diff)

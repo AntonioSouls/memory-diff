@@ -1,6 +1,7 @@
 from memory_diff.components.prop import Prop
 from memory_diff.components.tuv import Tuv
 from xml.etree.ElementTree import Element
+import hashlib
 
 # TranslatedUnit class that models an object that simulate the behavior of <tu> tag
 
@@ -19,19 +20,23 @@ class TranslatedUnit:
         self.tuv_second = Tuv(tuv_tag_list[1])
         
         prop_tag_list = tu_tmx.findall("prop")
-        if len(prop_tag_list) == 1:
-            prop_first_object = Prop(prop_tag_list[0])
+        if len(prop_tag_list) == 0:
+            prop_first_object = Prop(None)
             prop_second_object = Prop(None)
         else:
-            prop_first_object = Prop(prop_tag_list[0])
-            prop_second_object = Prop(prop_tag_list[1])
+            if len(prop_tag_list) == 1:
+                prop_first_object = Prop(prop_tag_list[0])
+                prop_second_object = Prop(None)
+            else:
+                prop_first_object = Prop(prop_tag_list[0])
+                prop_second_object = Prop(prop_tag_list[1])
         
         self.prop_first = prop_first_object
         self.prop_second = prop_second_object
 
     def getId(self):
         return self.tuid
-    def setId(self, id:int):
+    def setId(self, id):
         self.tuid = id
     
     def getRemoved(self):
@@ -92,10 +97,34 @@ class TranslatedUnit:
         return equals
 
     def __str__(self) -> str:
-        toString1 = f'    <tu tuid="{self.getId()}" srclang="{self.get_srclang()}" datatype="{self.get_datatype()}" creationdate="{self.get_creationdate()}" changedate="{self.get_changedate()}" removed="{self.getRemoved()}">\n      <prop type="{self.get_prop_first().getType()}">{self.get_prop_first().getContent()}</prop>\n'
-        if(self.get_prop_second() is not None):
+        if((self.getId() is None) and (self.get_srclang() is None) and (self.get_datatype() is None) and (self.get_creationdate() is None) and (self.get_changedate() is None) and (self.get_prop_first().getType() is None) and (self.get_prop_first().getContent() is None)):
+            toString1 = f'    <tu>\n'
+        else:
+            toString1 = f'    <tu tuid="{self.getId()}" srclang="{self.get_srclang()}" datatype="{self.get_datatype()}" creationdate="{self.get_creationdate()}" changedate="{self.get_changedate()}" removed="{self.getRemoved()}">\n      <prop type="{self.get_prop_first().getType()}">{self.get_prop_first().getContent()}</prop>\n'
+        
+        if((self.get_prop_second().getType() is not None) and (self.get_prop_second().getContent() is not None)):
             toString2 = f'      <prop type="{self.get_prop_second().getType()}">{self.get_prop_second().getContent()}</prop>\n'
             toString1 = toString1 + toString2
+        
         toString3 = f'      <tuv xml:lang="{self.get_tuv_first().get_xml()}">\n        <seg>{self.get_tuv_first().getContent()}</seg>\n      </tuv>\n      <tuv xml:lang="{self.get_tuv_second().get_xml()}">\n        <seg>{self.get_tuv_second().getContent()}</seg>\n      </tuv>\n    </tu>\n'
         toString = toString1 + toString3
         return toString
+
+
+    def hash_tu(self):
+        m = hashlib.sha256()
+
+        xml_first = self.get_tuv_first().get_xml()
+        xml_second = self.get_tuv_second().get_xml()
+        content_first = self.get_tuv_first().getContent()
+        content_second = self.get_tuv_second().getContent()
+        if xml_first is not None:
+            m.update(xml_first.encode(encoding='UTF-8'))
+        if xml_second is not None:
+            m.update(self.get_tuv_second().get_xml().encode(encoding='UTF-8'))
+        if content_first is not None:
+            m.update(self.get_tuv_first().getContent().encode(encoding='UTF-8'))
+        if content_second is not None:
+            m.update(self.get_tuv_second().getContent().encode(encoding='UTF-8'))
+        
+        return m.hexdigest()

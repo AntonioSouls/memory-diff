@@ -29,8 +29,8 @@ class DatasetDiff:
     def starting_diff_on_dataset(self):
         logger = self.logging_func()
         event = threading.Event()
-        thread1 = threading.Thread(target=self.cpu_usage,args=event)
-        thread2 = threading.Thread(target=self.ram_usage,args=event)
+        thread1 = threading.Thread(target=self.cpu_usage,args=(event,))
+        thread2 = threading.Thread(target=self.ram_usage,args=(event,))
         thread1.start()
         thread2.start()
         directory_new_path = Path(self.directory_new)
@@ -42,7 +42,7 @@ class DatasetDiff:
         diff_names = [f.name for f in list_file_diff]
         start = time.time()
         for file_new in tqdm(list_file_new):
-            if 'opus' not in file_new.name.lower() and file_new.name not in diff_names:         
+            if file_new.name not in diff_names:         
                 logger.info(f'{list_file_new.index(file_new)},{file_new.name}')
                 file_old = None
                 diff_file = str(Path(self.directory_diff) / file_new.name)
@@ -114,9 +114,10 @@ class DatasetDiff:
     
 
    
-    def cpu_usage(self,event):
+    def cpu_usage(self,event:threading.Event):
+        print("Cpu Usage")
         file_cpu_stats = str(Path(self.directory_stats) / "CPU_stats.txt")
-        while(event is not set):
+        while(not event.is_set()):
             misuration_cpu_usage = psutil.cpu_percent()
             with open(file_cpu_stats, 'a+') as f:
                 f.write('CPU usage: ' + str(misuration_cpu_usage)+ "\n")
@@ -125,9 +126,9 @@ class DatasetDiff:
         
 
       
-    def ram_usage(self,event):
+    def ram_usage(self,event:threading.Event):
         file_ram_stats = str(Path(self.directory_stats) / "RAM_stats.txt")
-        while(event is not set):
+        while(not event.is_set()):
             misuration_ram_usage = psutil.virtual_memory()[2]
             with open(file_ram_stats, 'a+') as f:
                 f.write('RAM usage: ' + str(misuration_ram_usage) + "\n")
