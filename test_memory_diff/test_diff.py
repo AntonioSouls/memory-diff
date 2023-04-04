@@ -5,7 +5,7 @@ from memory_diff.diff import Diff
 
 class Test_TestIncrementDecrement(unittest.TestCase):
 
-    def test_saving_diff(self,directory_new:str ='/home/antonio/dataset/2022.3.0/en__sw',directory_old:str='/home/antonio/dataset/2022.2.0/en__sw',directory_diff:str='/home/antonio/dataset/diff_folder',directory_stats:str='/home/antonio/dataset/stats'):
+    def test_saving_diff(self,directory_new:str ='/home/antonio/big_datasets/2022.3.0/en__it',directory_old:str='/home/antonio/big_datasets/2022.2.0/en__it',directory_diff:str='/home/antonio/big_datasets/diff_folder',directory_stats:str='/home/antonio/big_datasets/stats'):
         dataset_diff_object = DatasetDiff(directory_new,directory_old,directory_diff,directory_stats)
         dataset_diff_object.starting_diff_on_dataset()
         return
