@@ -101,6 +101,8 @@ class Diff:
             res = process.get()
             if res:
                 list_block_diff.append(res)
+        del new_dictionary_tu_object
+        del old_dictionary_tu_object
         self.saving_diff(list_block_diff)                                                                                                  
 
 
@@ -137,9 +139,11 @@ class Diff:
         diff_tmx = root + header + body + tu_units + body_end + root_end                                              
         bs_data = BeautifulSoup(diff_tmx, 'xml')                                  
         xml = bs_data.prettify("UTF-8")                                           
+        xml = xml.decode("utf-8")
 
-        with open(self.file_diff, 'wb') as f:                                     
-            f.write(xml)
+        with open(self.file_diff, 'w', buffering=20*(1024**2)) as f:
+            for line in xml.split("\n"):                                     
+                f.write(line + '\n')
     
 
    # Helper function to saving_diff to build the tmx format header on the file that will contain the differences

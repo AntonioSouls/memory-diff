@@ -8,6 +8,7 @@ import psutil
 import logging
 import threading
 import multiprocessing
+import os
 from numpy import mean
 
 
@@ -37,6 +38,8 @@ class DatasetDiff:
     # Method to prepare the execution environment and start the diff
     def starting_diff_on_dataset(self):
 
+        self.print_first_stats()
+
         logger = self.logging_func()                                      # I create a logger variable that I will use later to print the logging information to file
         
         event = threading.Event()                                         # I initiate an event that I will use to terminate the threads that will take care of printing the statistics of the CPU and RAM simultaneously with the execution of the code
@@ -55,7 +58,7 @@ class DatasetDiff:
         old_names = [f.name for f in list_file_old]
         diff_names = [f.name for f in list_file_diff]
 
-        pool = NoDeamonPool(16,)                                                        # I create a pool of 16 processes that will take care of making Diff on a file
+        pool = NoDeamonPool(8,)                                                        # I create a pool of 16 processes that will take care of making Diff on a file
         list_processes=list()                                                           # I need this to ensure that 16 files are analyzed at a time
         
         start = time.time()                                                             # I start a timer to calculate the start of the diff on the whole dataset, in order to measure how long it takes
@@ -87,8 +90,10 @@ class DatasetDiff:
                     file_old = list_file_old[old_names.index(file_new.name)]
                     diff_object = Diff(str(file_new), str(file_old), diff_file)                # I create the Diff object which will do the diff on the file
                     diff_object.diff_open_files()                                              # I invoke the diff object method which will parse and save the differences between the two files
+                    os.remove(file_old)
                 else:                                                                          # If it is not present in the old dataset, then that file has been added, so it should be placed in the dataset_diff
                     shutil.copyfile(file_new, diff_file)
+                os.remove(file_new)
                 ends = time.time()                                                             # Stop the timer
                 diff_time = ends - begin                                                       # I save the timer measurement in a list containing all diff time measurements
                 total_diff_time.append(diff_time)
@@ -110,9 +115,32 @@ class DatasetDiff:
         logger.addHandler(fh)
         return logger
 
+    # Method for saving statistics to a file. I print the size of the old and new datasets before starting with the diff because, during the execution, the Diff will erase all files into these two dataset 
+    def print_first_stats(self):
+        file_stats = str(Path(self.directory_stats) / "final_stats.txt")
+        directory_new_path_size = 0
+        directory_old_path_size = 0
+
+        for file_new in Path(self.directory_new).iterdir():
+            size = file_new.stat().st_size
+            directory_new_path_size = directory_new_path_size + size
+
+        for file_old in Path(self.directory_old).iterdir():
+            size = file_old.stat().st_size
+            directory_old_path_size = directory_old_path_size + size
+        
+        list_stats = []
+        list_stats.append('Dataset new size (Before the Diff): ' + str(directory_new_path_size) + ' bytes' + '\n')
+        list_stats.append('Dataset old size (Before the Diff): ' + str(directory_old_path_size) + 'bytes' + '\n')
+        list_stats.append('\n')
+        
+        with open(file_stats, 'a+') as f:
+            f.writelines(list_stats)
+        return
     
-   # Method for saving statistics to a file. I print the size of the various datasets, Average use of RAM and CPU, Average execution time of the diff, maximum execution time of the diff
-   # and code completion time
+
+   # Method for saving statistics to a file. I print the size of the diff datasets, Average use of RAM and CPU, Average execution time of the diff, maximum execution time of the diff
+   # and code completion time. I do it after the diff's execution.
     def print_stats(self):
         file_stats = str(Path(self.directory_stats) / "final_stats.txt")
         directory_new_path_size = 0
@@ -132,8 +160,8 @@ class DatasetDiff:
             directory_diff_path_size = directory_diff_path_size + size
 
         list_stats = []
-        list_stats.append('Dataset new size: ' + str(directory_new_path_size) + ' bytes' + '\n')
-        list_stats.append('Dataset old size: ' + str(directory_old_path_size) + 'bytes' + '\n')
+        list_stats.append('Dataset new size (After the Diff): ' + str(directory_new_path_size) + ' bytes' + '\n')
+        list_stats.append('Dataset old size (After the Diff): ' + str(directory_old_path_size) + 'bytes' + '\n')
         list_stats.append('Dataset diff size: ' + str(directory_diff_path_size) + 'bytes' + '\n')
         list_stats.append('\n')
         list_stats.append('Average CPU usage: ' + str(mean(self.total_CPU_usages)) + '%' + '\n')

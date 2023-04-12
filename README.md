@@ -4,6 +4,7 @@
 ` memory-diff ` is a library that was created with the aim of making the difference between two datasets:
 - A generic dataset
 - An updated version of the same dataset
+
 This should help to see if there have been any changes between the old version and the new version of the same dataset and, in our use case, this is convenient to allow Cooking Bot to train only on the changes and not also on data that it has already analyzed
 
 ## How it works
